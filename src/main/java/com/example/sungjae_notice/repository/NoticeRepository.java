@@ -1,7 +1,7 @@
 package com.example.sungjae_notice.repository;
 
 
-import com.example.sungjae_memo.entity.Notice;
+import com.example.sungjae_notice.entity.Notice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
