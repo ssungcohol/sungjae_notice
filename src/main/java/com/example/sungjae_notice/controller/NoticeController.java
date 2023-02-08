@@ -1,5 +1,6 @@
 package com.example.sungjae_notice.controller;
 
+import com.example.sungjae_notice.dto.NoticeMessageDto;
 import com.example.sungjae_notice.dto.NoticeRequestDto;
 import com.example.sungjae_notice.dto.NoticeResponseDto;
 import com.example.sungjae_notice.entity.Notice;
@@ -37,12 +38,13 @@ public class NoticeController {
 
     // 선택 게시글 수정
     @PutMapping("/api/notice/{id}")
-    public NoticeResponseDto update(@PathVariable Long id, @RequestBody NoticeRequestDto requestDto) {
+    public NoticeMessageDto update(@PathVariable Long id, @RequestBody NoticeRequestDto requestDto) {
         return noticeService.update(id, requestDto);
     }
 
     @DeleteMapping("/api/notice/{id}")
-    public boolean delete(@PathVariable Long id, @RequestBody NoticeRequestDto requestDto) {
+    public NoticeMessageDto delete(@PathVariable Long id, @RequestBody NoticeRequestDto requestDto) {
+        // 서비스단이랑 변수 타입 맞추는거 잊지말기
         return noticeService.delete(id, requestDto);
     }
 

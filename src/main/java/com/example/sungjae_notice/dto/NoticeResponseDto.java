@@ -14,7 +14,7 @@ public class NoticeResponseDto {
     private String username;
     private String title;
     private String contents;
-    private String password;
+//    private String password;
     private LocalDateTime createdat;
     private LocalDateTime modifiedat;
 
@@ -23,7 +23,7 @@ public class NoticeResponseDto {
         this.username = notice.getUsername();
         this.title = notice.getTitle();
         this.contents = notice.getContents();
-        this.password = notice.getPassword();
+//        this.password = notice.getPassword();
         this.createdat = notice.getCreatedAt();
         this.modifiedat = notice.getModifiedAt();
     }

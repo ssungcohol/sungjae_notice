@@ -1,5 +1,6 @@
 package com.example.sungjae_notice.service;
 
+import com.example.sungjae_notice.dto.NoticeMessageDto;
 import com.example.sungjae_notice.dto.NoticeRequestDto;
 import com.example.sungjae_notice.dto.NoticeResponseDto;
 import com.example.sungjae_notice.entity.Notice;
@@ -50,29 +51,29 @@ public class NoticeService {  // 이곳에서 데이터베이스와 연결을 �
 
     // 게시글 수정 및 비밀번호 조회
     @Transactional
-    public NoticeResponseDto update(Long id, NoticeRequestDto requestDto) {
+    public NoticeMessageDto update(Long id, NoticeRequestDto requestDto) {  // 컨트롤러랑 타입 맞추는거 잊지말기
         Notice notice = noticeRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
         if (requestDto.getPassword().equals(notice.getPassword())) {  //비밀번호가 일치하면
             notice.update(requestDto);
+            return new NoticeMessageDto("수정 성공");  //생성자를 생성하여 NoticeMessageDTO에 전달
         }
-        NoticeResponseDto noticeResponseDto = new NoticeResponseDto(notice);
-        return noticeResponseDto;
+        return new NoticeMessageDto("수정 못하쥬~~ 비밀번호 틀렸쥬~~");
     }
 
     // 게시글 삭제
     @Transactional
-    public boolean delete(Long id, NoticeRequestDto requestDto) {
+    public NoticeMessageDto delete(Long id, NoticeRequestDto requestDto) {
         Notice notice = noticeRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
         if (requestDto.getPassword().equals(notice.getPassword())) {  //비밀번호가 일치하면
-            return true;
+            noticeRepository.deleteById(id); // 게시물을 삭제하거라~~
+            return new NoticeMessageDto("삭제 성공");
         }
         else {
-            return false;
+            return new NoticeMessageDto("맘대로 못지우지~~ 어딜가~~");
         }
     }
-
 }
