@@ -22,7 +22,7 @@ public class NoticeService {  // 이곳에서 데이터베이스와 연결을 �
     // 게시글 목록 조회
     public List<NoticeResponseDto> getNotice() {
         List <Notice> noticeList = noticeRepository.findAllByOrderByModifiedAtDesc(); // 리스트 형태로 내림차순 정리
-        List <NoticeResponseDto> noticeResponseDtoList = new ArrayList<>();
+        List <NoticeResponseDto> noticeResponseDtoList = new ArrayList<>(); // 리스트 생성
         for (Notice notice : noticeList) {
             NoticeResponseDto tmp = new NoticeResponseDto(notice);
             noticeResponseDtoList.add(tmp);
@@ -33,7 +33,7 @@ public class NoticeService {  // 이곳에서 데이터베이스와 연결을 �
     // 게시글 작성
     @Transactional
     public NoticeResponseDto createNotice(NoticeRequestDto requestDto){
-        Notice notice = new Notice(requestDto);
+        Notice notice = new Notice(requestDto); // 객체 생성
         noticeRepository.save(notice);
         NoticeResponseDto noticeResponseDto = new NoticeResponseDto(notice);
         return noticeResponseDto;
@@ -43,7 +43,7 @@ public class NoticeService {  // 이곳에서 데이터베이스와 연결을 �
     @Transactional (readOnly = true)
     public NoticeResponseDto getNotice(Long id) {
         Notice notice = noticeRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.") //DB에 존재하지 않으면
         );
         NoticeResponseDto noticeResponseDto = new NoticeResponseDto(notice);
         return noticeResponseDto;
@@ -64,9 +64,9 @@ public class NoticeService {  // 이곳에서 데이터베이스와 연결을 �
 
     // 게시글 삭제
     @Transactional
-    public NoticeMessageDto delete(Long id, NoticeRequestDto requestDto) {
+    public NoticeMessageDto delete(Long id, NoticeRequestDto requestDto) { //delete라는 메소드
         Notice notice = noticeRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.") //예외처리
         );
         if (requestDto.getPassword().equals(notice.getPassword())) {  //비밀번호가 일치하면
             noticeRepository.deleteById(id); // 게시물을 삭제하거라~~
