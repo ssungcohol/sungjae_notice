@@ -34,7 +34,8 @@ public class Notice extends Timestamped {
     private User user;  // 회원가입, 로그인 시 토큰으로 넘겨받은 정보 연결
 
     //생성자
-    public Notice(NoticeRequestDto requestDto){  // 서버에서 DB 저장에 필요한 값을 만들어주는 곳
+    public Notice(NoticeRequestDto requestDto){
+        // 서버에서 DB 저장에 필요한 값을 만들어주는 곳
 //        this.username = requestDto.getUsername();
         this.contents = requestDto.getContents();
         this.title = requestDto.getTitle();
