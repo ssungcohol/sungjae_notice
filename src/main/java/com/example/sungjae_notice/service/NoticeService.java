@@ -4,11 +4,17 @@ import com.example.sungjae_notice.dto.NoticeMessageDto;
 import com.example.sungjae_notice.dto.NoticeRequestDto;
 import com.example.sungjae_notice.dto.NoticeResponseDto;
 import com.example.sungjae_notice.entity.Notice;
+import com.example.sungjae_notice.entity.User;
+import com.example.sungjae_notice.entity.UserRoleEnum;
+import com.example.sungjae_notice.jwt.JwtUtil;
 import com.example.sungjae_notice.repository.NoticeRepository;
+import com.example.sungjae_notice.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +24,10 @@ import java.util.List;
 public class NoticeService {  // 이곳에서 데이터베이스와 연결을 해줌
 
     private final NoticeRepository noticeRepository;  // 데이터와 연결하는 부분인 NoticeRepository를 사용할 수 있도록 추가
+
+    private final JwtUtil jwtUtil;
+
+    private final UserRepository userRepository;
 
     // 게시글 목록 조회
     public List<NoticeResponseDto> getNotice() {
@@ -32,48 +42,117 @@ public class NoticeService {  // 이곳에서 데이터베이스와 연결을 �
 
     // 게시글 작성
     @Transactional
-    public NoticeResponseDto createNotice(NoticeRequestDto requestDto){
-        Notice notice = new Notice(requestDto); // 객체 생성
-        noticeRepository.save(notice);
-        NoticeResponseDto noticeResponseDto = new NoticeResponseDto(notice);
-        return noticeResponseDto;
+    public NoticeResponseDto createNotice(NoticeRequestDto requestDto, HttpServletRequest request) {
+        // Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        // 토큰이 있는 경우에만 관심상품 추가 가능
+        if (token != null) {
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            // 요청받은 DTO 로 DB에 저장할 객체 만들기
+            Notice notice = noticeRepository.saveAndFlush(new Notice(requestDto, user));
+
+            return new NoticeResponseDto(notice);
+        } else {
+            return null;
+        }
     }
+
 
     // 선택 게시글 조회
     @Transactional (readOnly = true)
     public NoticeResponseDto getNotice(Long id) {
         Notice notice = noticeRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.") //DB에 존재하지 않으면
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
         NoticeResponseDto noticeResponseDto = new NoticeResponseDto(notice);
         return noticeResponseDto;
     }
 
+
+
     // 게시글 수정 및 비밀번호 조회
     @Transactional
-    public NoticeMessageDto update(Long id, NoticeRequestDto requestDto) {  // 컨트롤러랑 타입 맞추는거 잊지말기
-        Notice notice = noticeRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
-        if (requestDto.getPassword().equals(notice.getPassword())) {  //비밀번호가 일치하면
+    public NoticeResponseDto updateNotice(Long id, NoticeRequestDto requestDto, HttpServletRequest request) {
+        // NoticeResponseDto 타입! Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        // 토큰이 있는 경우에만 관심상품 최저가 업데이트 가능
+        if (token != null) {
+            // Token 검증
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            Notice notice = noticeRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
+                    () -> new NullPointerException("해당 게시물이 존재하지 않습니다.")
+            );
+
             notice.update(requestDto);
-            return new NoticeMessageDto("수정 성공");  //생성자를 생성하여 NoticeMessageDTO에 전달
+
+            return new NoticeResponseDto(notice); // 수정된 게시글 반환
+
+        } else {
+            return null;
         }
-        return new NoticeMessageDto("수정 못하쥬~~ 비밀번호 틀렸쥬~~");
     }
+
 
     // 게시글 삭제
     @Transactional
-    public NoticeMessageDto delete(Long id, NoticeRequestDto requestDto) { //delete라는 메소드
-        Notice notice = noticeRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.") //예외처리
-        );
-        if (requestDto.getPassword().equals(notice.getPassword())) {  //비밀번호가 일치하면
-            noticeRepository.deleteById(id); // 게시물을 삭제하거라~~
+    public NoticeMessageDto deleteNotice(Long id, NoticeRequestDto requestDto, HttpServletRequest request) {
+        // Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        // 토큰이 있는 경우에만 관심상품 최저가 업데이트 가능
+        if (token != null) {
+            // Token 검증
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            Notice notice = noticeRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
+                    () -> new NullPointerException("해당 게시물이 존재하지 않습니다.")
+            );
+
+            noticeRepository.deleteById(id);
+
             return new NoticeMessageDto("삭제 성공");
-        }
-        else {
-            return new NoticeMessageDto("맘대로 못지우지~~ 어딜가~~");
+
+        } else {
+            return new NoticeMessageDto("삭제 실패");
         }
     }
+
+
 }

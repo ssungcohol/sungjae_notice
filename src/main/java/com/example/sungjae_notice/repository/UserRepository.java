@@ -1,6 +1,6 @@
 package com.example.sungjae_notice.repository;
 
-import com.example.notice_test.entity.User;
+import com.example.sungjae_notice.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -23,7 +23,6 @@ public class NoticeResponseDto {
         this.username = notice.getUsername();
         this.title = notice.getTitle();
         this.contents = notice.getContents();
-//        this.password = notice.getPassword();
         this.createdat = notice.getCreatedAt();
         this.modifiedat = notice.getModifiedAt();
     }

@@ -1,14 +1,14 @@
 package com.example.sungjae_notice.controller;
 
-import com.example.notice_test.dto.LoginRequestDto;
-import com.example.notice_test.dto.SignupRequestDto;
-import com.example.notice_test.service.UserService;
+import com.example.sungjae_notice.dto.LoginRequestDto;
+import com.example.sungjae_notice.dto.SignupRequestDto;
+import com.example.sungjae_notice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,9 +40,19 @@ public class UserController {
         return "redirect:/api/user/login";
     }
 
+// 토큰 주입 전
+//    @PostMapping("/login")
+//    public String login(LoginRequestDto loginRequestDto) {
+//        userService.login(loginRequestDto);
+//        return "redirect:/api/Notice";
+//    }
+//}
+
+    // 토큰 수정 후
+    @ResponseBody
     @PostMapping("/login")
-    public String login(LoginRequestDto loginRequestDto) {
-        userService.login(loginRequestDto);
-        return "redirect:/api/Notice";
+    public String login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        userService.login(loginRequestDto, response);
+        return "success";
     }
 }
