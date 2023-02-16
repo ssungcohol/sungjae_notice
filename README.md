@@ -12,4 +12,4 @@
 
 ## ERD
 
-![항해_spring_week2](https://user-images.githubusercontent.com/119986573/219303092-1a7f32fa-1854-4270-b564-387727d50ae9.png)
+![ERD](https://user-images.githubusercontent.com/119986573/219303467-7db93044-0ddf-488e-a017-7a4bcef30602.JPG)
