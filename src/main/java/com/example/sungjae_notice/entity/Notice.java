@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 // 1. JPA
 // 데입터베이스와 자바 객체의 맵핑을 위한 기술
@@ -29,12 +31,18 @@ public class Notice extends Timestamped {
 //    @Column(nullable = false)  토큰 사용으로 사용자 정보 수정/삭제하기 위해 사용
 //    private String password;
 
+    // 사용자 한 명에 게시글 여러개
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;  // 회원가입, 로그인 시 토큰으로 넘겨받은 정보 연결
+    private User user;
+
+
+    // 게시글 하나에 댓글 여러개
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
+    List<Comment> comments = new ArrayList<>(); // 댓글 가져오기
 
     //생성자
-    public Notice(NoticeRequestDto requestDto){
+    public Notice(NoticeRequestDto requestDto, User user){
         // 서버에서 DB 저장에 필요한 값을 만들어주는 곳
 //        this.username = requestDto.getUsername();
         this.contents = requestDto.getContents();

@@ -1,9 +1,11 @@
 package com.example.sungjae_notice.dto;
 
+import com.example.sungjae_notice.entity.Comment;
 import com.example.sungjae_notice.entity.Notice;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 // DTO 반환이라는 과제 조건이 있음.
 //
@@ -18,12 +20,15 @@ public class NoticeResponseDto {
     private LocalDateTime createdat;
     private LocalDateTime modifiedat;
 
-    public NoticeResponseDto(Notice notice) {
+    private List<Comment> comment;
+
+    public NoticeResponseDto(Notice notice, List<Comment> comment) {
         this.id = notice.getId();
-        this.username = notice.getUsername();
+        this.username = notice.getUser().getUsername();
         this.title = notice.getTitle();
         this.contents = notice.getContents();
         this.createdat = notice.getCreatedAt();
         this.modifiedat = notice.getModifiedAt();
+        this.comment = comment;
     }
 }
