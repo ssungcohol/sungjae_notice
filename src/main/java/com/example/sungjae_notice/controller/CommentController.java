@@ -30,7 +30,7 @@ public class CommentController {
     }
 
 
-    // 댓글 수정
+    // 댓글 삭제
     @DeleteMapping("/api/notice/{noticeId}/comment/{commentId}")
     public CommentMessageDto deleteComment(@PathVariable Long noticeId, @PathVariable Long commentId, @RequestBody CommentRequestDto comRequestDto, HttpServletRequest request) {
 
